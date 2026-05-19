@@ -1,484 +1,627 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Infinite Batting Practice 3D</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-user-select: none;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            background-color: #0d131a;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-        #game-container {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-            max-width: 1024px;
-            max-height: 768px;
-            background: linear-gradient(to bottom, #111d4a, #2a5298);
-            overflow: hidden;
-        }
-        canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-        #ui-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-        }
-        .hud {
-            position: absolute;
-            top: 20px;
-            background: rgba(11, 19, 30, 0.85);
-            padding: 12px 25px;
-            border-radius: 30px;
-            color: white;
-            font-weight: 800;
-            font-size: 1.1rem;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(8px);
-            pointer-events: auto;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-        }
-        #stats-panel {
-            left: 20px;
-            display: flex;
-            gap: 20px;
-        }
-        .stat-group {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .label { color: #8a9fc4; font-size: 0.85rem; text-transform: uppercase; }
-        .val { color: #fff; }
-        #streak-val { color: #ff9f43; font-weight: 900; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Infinite Batting Practice 3D</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      margin: 0;
+      padding: 0;
+    }
 
-        #pitch-feedback {
-            right: 20px;
-            color: #fff;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            min-width: 180px;
-            text-align: center;
-            transition: all 0.2s ease;
-        }
-        .fb-good { color: #2ed573 !important; text-shadow: 0 0 10px rgba(46,213,115,0.4); }
-        .fb-great { color: #ff9f43 !important; text-shadow: 0 0 15px rgba(255,159,67,0.6); }
-        .fb-miss { color: #ff4757 !important; }
+    body {
+      background-color: #0d131a;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
 
-        /* Bottom right corner control placement */
-        #touch-zone {
-            position: absolute;
-            bottom: 40px;
-            right: 40px;
-            pointer-events: auto;
-            z-index: 10;
-        }
-        #swing-btn {
-            width: 130px;
-            height: 130px;
-            background: linear-gradient(135deg, #ff4757, #ff6b81);
-            border-radius: 50%;
-            border: 5px solid #ffffff;
-            color: white;
-            font-size: 1.6rem;
-            font-weight: 900;
-            box-shadow: 0 12px 24px rgba(255, 71, 87, 0.4);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: transform 0.05s;
-        }
-        #swing-btn:active {
-            transform: scale(0.90) translateY(4px);
-        }
-    </style>
+    #game-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      max-width: 1024px;
+      max-height: 768px;
+      background: linear-gradient(to bottom, #111d4a, #2a5298);
+      overflow: hidden;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    #ui-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .hud {
+      position: absolute;
+      top: 20px;
+      background: rgba(11, 19, 30, 0.85);
+      padding: 12px 25px;
+      border-radius: 30px;
+      color: white;
+      font-weight: 800;
+      font-size: 1.1rem;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      pointer-events: auto;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+
+    #stats-panel {
+      left: 20px;
+      display: flex;
+      gap: 20px;
+    }
+
+    .stat-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .label {
+      color: #8a9fc4;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+    }
+
+    .val {
+      color: #fff;
+    }
+
+    #streak-val {
+      color: #ff9f43;
+      font-weight: 900;
+    }
+
+    #pitch-feedback {
+      right: 20px;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      min-width: 180px;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .fb-good {
+      color: #2ed573 !important;
+      text-shadow: 0 0 10px rgba(46,213,115,0.4);
+    }
+
+    .fb-great {
+      color: #ff9f43 !important;
+      text-shadow: 0 0 15px rgba(255,159,67,0.6);
+    }
+
+    .fb-miss {
+      color: #ff4757 !important;
+    }
+
+    #touch-zone {
+      position: absolute;
+      bottom: 40px;
+      right: 40px;
+      pointer-events: auto;
+      z-index: 10;
+    }
+
+    #swing-btn {
+      width: 130px;
+      height: 130px;
+      background: linear-gradient(135deg, #ff4757, #ff6b81);
+      border-radius: 50%;
+      border: 5px solid #ffffff;
+      color: white;
+      font-size: 1.6rem;
+      font-weight: 900;
+      box-shadow: 0 12px 24px rgba(255, 71, 87, 0.4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: transform 0.05s;
+      cursor: pointer;
+    }
+
+    #swing-btn:active {
+      transform: scale(0.90) translateY(4px);
+    }
+
+    #start-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(4, 8, 18, 0.82);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 20;
+      text-align: center;
+      padding: 30px;
+      pointer-events: auto;
+    }
+
+    #start-overlay h1 {
+      font-size: clamp(2.1rem, 6vw, 4rem);
+      margin-bottom: 12px;
+      text-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    }
+
+    #start-overlay p {
+      max-width: 520px;
+      color: #cbd5e1;
+      line-height: 1.5;
+      margin-bottom: 24px;
+      font-size: 1rem;
+    }
+
+    #start-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 16px 32px;
+      font-weight: 900;
+      font-size: 1.1rem;
+      color: white;
+      background: linear-gradient(135deg, #2ed573, #1eae59);
+      box-shadow: 0 14px 30px rgba(46, 213, 115, 0.25);
+      cursor: pointer;
+    }
+
+    #brand {
+      position: absolute;
+      left: 20px;
+      bottom: 18px;
+      color: rgba(255,255,255,0.65);
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    @media (max-width: 650px) {
+      .hud {
+        top: 14px;
+        padding: 10px 14px;
+        font-size: 0.9rem;
+      }
+
+      #stats-panel {
+        left: 10px;
+        gap: 10px;
+      }
+
+      #pitch-feedback {
+        right: 10px;
+        min-width: 120px;
+      }
+
+      #touch-zone {
+        right: 20px;
+        bottom: 24px;
+      }
+
+      #swing-btn {
+        width: 105px;
+        height: 105px;
+        font-size: 1.25rem;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div id="game-container">
+    <canvas id="gameCanvas"></canvas>
 
-<div id="game-container">
-    <canvas id="gameCanvas"></canvas>
-    
-    <div id="ui-layer">
-        <div id="stats-panel" class="hud">
-            <div class="stat-group"><span class="label">HITS:</span><span id="hits-val" class="val">0</span></div>
-            <div class="stat-group"><span class="label">STREAK:</span><span id="streak-val" class="val">0</span></div>
-        </div>
-        
-        <div id="pitch-feedback" class="hud">LOADING...</div>
-        
-        <div id="touch-zone">
-            <div id="swing-btn">SWING</div>
-        </div>
-    </div>
-</div>
+    <div id="ui-layer">
+      <div id="stats-panel" class="hud">
+        <div class="stat-group"><span class="label">Hits:</span><span id="hits-val" class="val">0</span></div>
+        <div class="stat-group"><span class="label">Streak:</span><span id="streak-val" class="val">0</span></div>
+      </div>
 
-<script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    const hitsVal = document.getElementById('hits-val');
-    const streakVal = document.getElementById('streak-val');
-    const pitchFeedback = document.getElementById('pitch-feedback');
-    const swingBtn = document.getElementById('swing-btn');
+      <div id="pitch-feedback" class="hud">Ready</div>
 
-    function resizeCanvas() {
-        const container = document.getElementById('game-container');
-        canvas.width = container.clientWidth * window.devicePixelRatio;
-        canvas.height = container.clientHeight * window.devicePixelRatio;
-        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+      <div id="touch-zone">
+        <div id="swing-btn">SWING</div>
+      </div>
 
-    const width = 1024;
-    const height = 768;
+      <div id="brand">BlaizGamingIndustries</div>
+    </div>
 
-    // Practice Mode State Machine
-    let totalHits = 0;
-    let currentStreak = 0;
-    let gameState = 'ready'; // ready, pitching, contact, tracking
-    let autoPitchTimer = null;
-    
-    // Smooth Camera Setup
-    const cam = { horizon: 310, fov: 380, center: 512 };
+    <div id="start-overlay">
+      <h1>Infinite Batting Practice 3D</h1>
+      <p>Watch the pitch come toward the plate. Swing when the ball reaches the hitting zone. Better timing earns better hits and builds your streak.</p>
+      <button id="start-btn">START GAME</button>
+    </div>
+  </div>
 
-    function project3D(x, y, z) {
-        const scale = cam.fov / (cam.fov + z);
-        return {
-            x: cam.center + (x * scale),
-            y: cam.horizon + (y * scale),
-            scale: scale
-        };
-    }
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    const container = document.getElementById("game-container");
 
-    // Ball Simulation Engine
-    let ball = { x: 0, y: -45, z: 650, vx: 0, vy: 0, vz: 0, radius: 9, active: false };
-    
-    // Fluid Batter Geometry Configuration
-    let batter = {
-        x: -75, y: 170, z: 40,
-        batLength: 115,
-        swingFrame: 0,
-        isSwinging: false,
-        angle: -Math.PI / 4
-    };
+    const hitsVal = document.getElementById("hits-val");
+    const streakVal = document.getElementById("streak-val");
+    const pitchFeedback = document.getElementById("pitch-feedback");
+    const swingBtn = document.getElementById("swing-btn");
+    const startOverlay = document.getElementById("start-overlay");
+    const startBtn = document.getElementById("start-btn");
 
-    // visual hitting cage lines tracking 
-    let cagePoints = [];
-    for(let i=0; i<=650; i+=50) {
-        cagePoints.push(i);
-    }
+    let cw = 1024;
+    let ch = 768;
+    let dpr = 1;
 
-    let particles = [];
-    function spawnParticles(x, y, color, count=25) {
-        for(let i=0; i<count; i++) {
-            particles.push({
-                x: x, y: y,
-                vx: (Math.random() - 0.5) * 18,
-                vy: (Math.random() - 0.5) * 18,
-                r: Math.random() * 4 + 2,
-                alpha: 1,
-                color: color
-            });
-        }
-    }
+    let gameRunning = false;
+    let totalHits = 0;
+    let streak = 0;
+    let swingFlash = 0;
+    let lastTime = 0;
 
-    // Multi-touch & Input configuration
-    swingBtn.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        executeSwing();
-    });
-    window.addEventListener('keydown', (e) => {
-        if(e.code === 'Space') executeSwing();
-    });
+    const plate = {
+      x: 0,
+      y: 0,
+      w: 115,
+      h: 34
+    };
 
-    function executeSwing() {
-        if (batter.isSwinging) return;
-        
-        batter.isSwinging = true;
-        batter.swingFrame = 1;
+    let ball = null;
 
-        // Dynamic hit engine check
-        if (ball.active && gameState === 'pitching') {
-            // Check hitting window plane depth
-            if (ball.z >= 15 && ball.z <= 95) {
-                ball.active = false;
-                gameState = 'contact';
-                
-                const distanceToSweetSpot = Math.abs(ball.z - 50);
-                
-                if (distanceToSweetSpot < 18) { // Perfect Timing Burst
-                    totalHits++;
-                    currentStreak++;
-                    setFeedback("🔥 CRUSHED!", "fb-great");
-                    spawnParticles(project3D(ball.x, ball.y, ball.z).x, project3D(ball.x, ball.y, ball.z).y, '#ff9f43', 35);
-                    
-                    ball.vx = (Math.random() - 0.5) * 25;
-                    ball.vy = -28;
-                    ball.vz = 500; 
-                } else { // Safe Solid Base Hit
-                    totalHits++;
-                    currentStreak++;
-                    setFeedback("⚾ GOOD HIT!", "fb-good");
-                    spawnParticles(project3D(ball.x, ball.y, ball.z).x, project3D(ball.x, ball.y, ball.z).y, '#2ed573', 20);
-                    
-                    ball.vx = (Math.random() - 0.5) * 18;
-                    ball.vy = -14;
-                    ball.vz = 300;
-                }
-                
-                updateCounters();
-                queueNextPitch(2200);
-            }
-        }
-    }
+    function resizeCanvas() {
+      dpr = Math.max(1, window.devicePixelRatio || 1);
+      const rect = container.getBoundingClientRect();
 
-    function setFeedback(text, className="") {
-        pitchFeedback.innerText = text;
-        pitchFeedback.className = "hud " + className;
-    }
+      cw = Math.max(320, rect.width);
+      ch = Math.max(480, rect.height);
 
-    function updateCounters() {
-        hitsVal.innerText = totalHits;
-        streakVal.innerText = currentStreak;
-    }
+      canvas.width = Math.floor(cw * dpr);
+      canvas.height = Math.floor(ch * dpr);
 
-    // Unstoppable Batting Practice Pipeline Auto-Throw
-    function autoThrowPitch() {
-        // Enforce reset on old states safely
-        if(autoPitchTimer) clearTimeout(autoPitchTimer);
-        
-        gameState = 'pitching';
-        setFeedback("PITCH COMING...", "");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-        // Reset ball path coordinates to launch machine position
-        ball.x = (Math.random() - 0.5) * 8; 
-        ball.y = -40; 
-        ball.z = 650; 
-        
-        // Balanced easy glide speeds 
-        ball.vz = -8.2; 
-        ball.vy = 2.0;  
-        ball.vx = (Math.random() - 0.5) * 0.4;
-        ball.active = true;
-    }
+      plate.x = cw / 2;
+      plate.y = ch * 0.76;
+    }
 
-    function queueNextPitch(delay) {
-        if(autoPitchTimer) clearTimeout(autoPitchTimer);
-        gameState = 'tracking';
-        autoPitchTimer = setTimeout(() => {
-            autoThrowPitch();
-        }, delay);
-    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
 
-    // Frame Interpolation Pipeline Loop
-    function update() {
-        // Multi-frame rotational swing script
-        if (batter.isSwinging) {
-            batter.swingFrame++;
-            let progress = batter.swingFrame / 15; // Normalized frame duration
-            
-            // Complete smooth trigonometric rotational arc
-            batter.angle = -Math.PI/4 + (Math.PI * 1.35 * Math.sin(progress * Math.PI / 2));
+    function createPitch() {
+      const sideDrift = random(-85, 85);
+      const speed = random(0.0065, 0.0105);
 
-            if (batter.swingFrame >= 15) {
-                batter.isSwinging = false;
-                batter.swingFrame = 0;
-                batter.angle = -Math.PI / 4; 
-            }
-        }
+      ball = {
+        progress: 0,
+        speed,
+        startX: cw / 2 + random(-35, 35),
+        endX: cw / 2 + sideDrift,
+        startY: ch * 0.28,
+        endY: plate.y - 22,
+        hit: false,
+        missed: false
+      };
 
-        // Processing active pitches towards plate
-        if (ball.active && gameState === 'pitching') {
-            ball.z += ball.vz;
-            ball.y += ball.vy;
-            ball.x += ball.vx;
+      setFeedback("Pitch incoming", "");
+    }
 
-            // Missed execution fallback route
-            if (ball.z < -20) {
-                ball.active = false;
-                currentStreak = 0;
-                updateCounters();
-                setFeedback("❌ MISS / STRIKE", "fb-miss");
-                queueNextPitch(1500); // Instantly queues next automated pitch
-            }
-        }
+    function random(min, max) {
+      return Math.random() * (max - min) + min;
+    }
 
-        // Forward fly ball physics update engine
-        if (!ball.active && (gameState === 'contact' || gameState === 'tracking')) {
-            ball.z += ball.vz;
-            ball.y += ball.vy;
-            ball.x += ball.vx;
-            if(ball.y < 350) ball.vy += 0.5; // Simulate smooth gravity drop arc
-        }
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
 
-        // Particle thread execution loops
-        for (let i = particles.length - 1; i >= 0; i--) {
-            let p = particles[i];
-            p.x += p.vx;
-            p.y += p.vy;
-            p.alpha -= 0.025;
-            if (p.alpha <= 0) particles.splice(i, 1);
-        }
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
 
-        // Safe loop structural initialization fallback
-        if (gameState === 'ready') {
-            queueNextPitch(1000);
-        }
-    }
+    function easeInQuad(t) {
+      return t * t;
+    }
 
-    // Dynamic 3D Scene Rendering
-    function draw() {
-        ctx.clearRect(0, 0, width, height);
+    function getBallScreenPosition() {
+      if (!ball) {
+        return { x: cw / 2, y: ch * 0.28, radius: 6, t: 0 };
+      }
 
-        // 1. Render Outfield Green Astro Turf
-        ctx.fillStyle = '#10ac84';
-        ctx.fillRect(0, cam.horizon, width, height - cam.horizon);
+      const t = clamp(ball.progress, 0, 1);
+      const eased = easeInQuad(t);
 
-        // 2. Render 3D Batting Tunnel Mesh Guides
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-        ctx.lineWidth = 2;
-        cagePoints.forEach(z => {
-            let leftWall = project3D(-180, -120, z);
-            let rightWall = project3D(180, -120, z);
-            let leftFloor = project3D(-180, 180, z);
-            let rightFloor = project3D(180, 180, z);
-            
-            ctx.beginPath();
-            ctx.moveTo(leftWall.x, leftWall.y);
-            ctx.lineTo(rightWall.x, rightWall.y);
-            ctx.lineTo(rightFloor.x, rightFloor.y);
-            ctx.lineTo(leftFloor.x, leftFloor.y);
-            ctx.closePath();
-            ctx.stroke();
-        });
+      const x = lerp(ball.startX, ball.endX, eased);
+      const y = lerp(ball.startY, ball.endY, eased);
 
-        // 3. Render Solid Clay Infield Batter Box Circle
-        let pPlate = project3D(0, 180, 50);
-        ctx.fillStyle = '#dd8d54';
-        ctx.beginPath();
-        ctx.ellipse(pPlate.x, pPlate.y, 140 * pPlate.scale, 50 * pPlate.scale, 0, 0, Math.PI*2);
-        ctx.fill();
+      // This is the important safety fix:
+      // radius is always positive and finite, so Canvas arc() will not crash.
+      const radius = clamp(6 + eased * 30, 6, 38);
 
-        // White home plate line draw
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.moveTo(pPlate.x - 22 * pPlate.scale, pPlate.y);
-        ctx.lineTo(pPlate.x + 22 * pPlate.scale, pPlate.y);
-        ctx.lineTo(pPlate.x + 26 * pPlate.scale, pPlate.y + 16 * pPlate.scale);
-        ctx.lineTo(pPlate.x, pPlate.y + 32 * pPlate.scale);
-        ctx.lineTo(pPlate.x - 26 * pPlate.scale, pPlate.y + 16 * pPlate.scale);
-        ctx.closePath();
-        ctx.fill();
+      return { x, y, radius, t };
+    }
 
-        // 4. Clean Mechanical Pitching Machine Object (Replaces weird players)
-        let pMachine = project3D(0, 180, 650);
-        ctx.fillStyle = '#2c3e50'; // Machine Base housing
-        ctx.fillRect(pMachine.x - 16 * pMachine.scale, pMachine.y - 45 * pMachine.scale, 32 * pMachine.scale, 45 * pMachine.scale);
-        ctx.fillStyle = '#7f8c8d'; // Launch feeder pipe
-        ctx.beginPath();
-        ctx.arc(pMachine.x, pMachine.y - 45 * pMachine.scale, 10 * pMachine.scale, 0, Math.PI*2);
-        ctx.fill();
+    function setFeedback(text, className) {
+      pitchFeedback.textContent = text;
+      pitchFeedback.className = "hud";
+      if (className) pitchFeedback.classList.add(className);
+    }
 
-        // 5. Render Batter Shadow Geometry
-        let pBatter = project3D(batter.x, batter.y, batter.z);
-        ctx.fillStyle = 'rgba(0,0,0,0.35)';
-        ctx.beginPath();
-        ctx.ellipse(pBatter.x, pBatter.y + 10, 42 * pBatter.scale, 14 * pBatter.scale, 0, 0, Math.PI*2);
-        ctx.fill();
+    function updateHud() {
+      hitsVal.textContent = totalHits;
+      streakVal.textContent = streak;
+    }
 
-        // 6. Draw Detailed Batter Character Mesh Model
-        ctx.fillStyle = '#0984e3'; // Clean Pro Jersey
-        ctx.fillRect(pBatter.x - 18 * pBatter.scale, pBatter.y - 92 * pBatter.scale, 36 * pBatter.scale, 92 * pBatter.scale); 
-        ctx.fillStyle = '#ffeedd'; // Skin tone elements
-        ctx.beginPath();
-        ctx.arc(pBatter.x, pBatter.y - 108 * pBatter.scale, 16 * pBatter.scale, 0, Math.PI*2); 
-        ctx.fill();
-        ctx.fillStyle = '#222f3e'; // Protection Helmet
-        ctx.beginPath();
-        ctx.arc(pBatter.x, pBatter.y - 112 * pBatter.scale, 17 * pBatter.scale, Math.PI, 0); 
-        ctx.fill();
+    function startGame() {
+      totalHits = 0;
+      streak = 0;
+      swingFlash = 0;
+      updateHud();
+      startOverlay.style.display = "none";
+      gameRunning = true;
+      createPitch();
+      lastTime = performance.now();
+      requestAnimationFrame(gameLoop);
+    }
 
-        // 7. Render 3D Bat with Vector Matrix Rotational sweeps
-        ctx.save();
-        ctx.translate(pBatter.x + 12 * pBatter.scale, pBatter.y - 68 * pBatter.scale);
-        ctx.rotate(batter.angle);
-        
-        let batGrad = ctx.createLinearGradient(0, 0, batter.batLength * pBatter.scale, 0);
-        batGrad.addColorStop(0, '#2d3436'); // Grip tape wrap 
-        batGrad.addColorStop(0.2, '#f39c12'); // Natural wood grain barrel
-        batGrad.addColorStop(1, '#f1c40f');
-        ctx.fillStyle = batGrad;
-        
-        ctx.beginPath();
-        ctx.moveTo(0, -3 * pBatter.scale);
-        ctx.lineTo(batter.batLength * pBatter.scale, -8 * pBatter.scale);
-        ctx.lineTo(batter.batLength * pBatter.scale, 8 * pBatter.scale);
-        ctx.lineTo(0, 3 * pBatter.scale);
-        ctx.closePath();
-        ctx.fill();
-        ctx.restore();
+    function swing() {
+      if (!gameRunning || !ball || ball.hit || ball.missed) return;
 
-        // 8. Render 3D Ball Asset Profile
-        if (ball.active || gameState === 'contact' || gameState === 'tracking') {
-            let pBall = project3D(ball.x, ball.y, ball.z);
-            let pBallShadow = project3D(ball.x, 180, ball.z);
-            
-            // Ground track trace shadow circle
-            ctx.fillStyle = 'rgba(0,0,0,0.3)';
-            ctx.beginPath();
-            ctx.arc(pBallShadow.x, pBallShadow.y, (ball.radius * pBallShadow.scale) * 1.1, 0, Math.PI*2);
-            ctx.fill();
+      swingFlash = 6;
 
-            // Luminous Baseball Core Render
-            ctx.fillStyle = '#ffffff';
-            ctx.shadowBlur = 12;
-            ctx.shadowColor = '#ffffff';
-            ctx.beginPath();
-            ctx.arc(pBall.x, pBall.y, ball.radius * pBall.scale, 0, Math.PI*2);
-            ctx.fill();
-            ctx.shadowBlur = 0; 
-        }
+      const pos = getBallScreenPosition();
+      const timingDistance = Math.abs(pos.y - (plate.y - 22));
+      const horizontalDistance = Math.abs(pos.x - plate.x);
 
-        // 9. Particles rendering loop array
-        particles.forEach(p => {
-            ctx.save();
-            ctx.globalAlpha = p.alpha;
-            ctx.fillStyle = p.color;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
-        });
-    }
+      if (timingDistance < 24 && horizontalDistance < 95) {
+        totalHits++;
+        streak++;
 
-    function gameLoop() {
-        update();
-        draw();
-        requestAnimationFrame(gameLoop);
-    }
+        if (timingDistance < 10 && horizontalDistance < 45) {
+          setFeedback("Perfect hit!", "fb-great");
+        } else {
+          setFeedback("Good hit!", "fb-good");
+        }
 
-    gameLoop();
-</script>
+        ball.hit = true;
+        updateHud();
 
+        setTimeout(createPitch, 650);
+      } else {
+        streak = 0;
+        setFeedback("Miss!", "fb-miss");
+        ball.missed = true;
+        updateHud();
+
+        setTimeout(createPitch, 650);
+      }
+    }
+
+    swingBtn.addEventListener("click", swing);
+    swingBtn.addEventListener("touchstart", function(e) {
+      e.preventDefault();
+      swing();
+    }, { passive: false });
+
+    window.addEventListener("keydown", function(e) {
+      if (e.code === "Space") {
+        e.preventDefault();
+        swing();
+      }
+    });
+
+    startBtn.addEventListener("click", startGame);
+
+    function update(dt) {
+      if (!ball || ball.hit || ball.missed) return;
+
+      ball.progress += ball.speed * dt;
+
+      if (ball.progress >= 1.08) {
+        streak = 0;
+        ball.missed = true;
+        setFeedback("Strike!", "fb-miss");
+        updateHud();
+        setTimeout(createPitch, 650);
+      }
+
+      if (swingFlash > 0) swingFlash--;
+    }
+
+    function drawField() {
+      // Sky
+      const sky = ctx.createLinearGradient(0, 0, 0, ch);
+      sky.addColorStop(0, "#13225c");
+      sky.addColorStop(0.55, "#2a5298");
+      sky.addColorStop(1, "#18351f");
+      ctx.fillStyle = sky;
+      ctx.fillRect(0, 0, cw, ch);
+
+      // Stadium lights
+      ctx.fillStyle = "rgba(255, 255, 220, 0.16)";
+      ctx.beginPath();
+      ctx.arc(cw * 0.16, ch * 0.14, 80, 0, Math.PI * 2);
+      ctx.arc(cw * 0.84, ch * 0.14, 80, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Outfield
+      ctx.fillStyle = "#1f7a3f";
+      ctx.beginPath();
+      ctx.ellipse(cw / 2, ch * 0.78, cw * 0.56, ch * 0.32, 0, Math.PI, Math.PI * 2);
+      ctx.fill();
+
+      // Infield dirt
+      ctx.fillStyle = "#b8793b";
+      ctx.beginPath();
+      ctx.moveTo(cw / 2, ch * 0.38);
+      ctx.lineTo(cw * 0.25, ch * 0.78);
+      ctx.lineTo(cw / 2, ch * 0.96);
+      ctx.lineTo(cw * 0.75, ch * 0.78);
+      ctx.closePath();
+      ctx.fill();
+
+      // Baselines
+      ctx.strokeStyle = "rgba(255,255,255,0.9)";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(cw / 2, plate.y);
+      ctx.lineTo(cw * 0.25, ch * 0.78);
+      ctx.moveTo(cw / 2, plate.y);
+      ctx.lineTo(cw * 0.75, ch * 0.78);
+      ctx.stroke();
+
+      // Pitcher's mound
+      ctx.fillStyle = "#d39b58";
+      ctx.beginPath();
+      ctx.ellipse(cw / 2, ch * 0.44, 58, 18, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Home plate
+      ctx.fillStyle = "#f8fafc";
+      ctx.strokeStyle = "#1e293b";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(plate.x - plate.w / 2, plate.y - plate.h / 2);
+      ctx.lineTo(plate.x + plate.w / 2, plate.y - plate.h / 2);
+      ctx.lineTo(plate.x + plate.w / 2 - 20, plate.y + plate.h / 2);
+      ctx.lineTo(plate.x, plate.y + plate.h / 2 + 18);
+      ctx.lineTo(plate.x - plate.w / 2 + 20, plate.y + plate.h / 2);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Hitting zone guide
+      ctx.strokeStyle = "rgba(255,255,255,0.22)";
+      ctx.lineWidth = 2;
+      ctx.setLineDash([8, 8]);
+      ctx.strokeRect(plate.x - 95, plate.y - 68, 190, 95);
+      ctx.setLineDash([]);
+    }
+
+    function drawBatter() {
+      const x = cw / 2 - 155;
+      const y = plate.y + 42;
+
+      // Body
+      ctx.strokeStyle = "#111827";
+      ctx.lineWidth = 10;
+      ctx.lineCap = "round";
+
+      ctx.beginPath();
+      ctx.moveTo(x, y - 70);
+      ctx.lineTo(x, y);
+      ctx.lineTo(x - 28, y + 50);
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + 24, y + 50);
+      ctx.stroke();
+
+      // Head
+      ctx.fillStyle = "#f3c58f";
+      ctx.beginPath();
+      ctx.arc(x, y - 95, 20, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Helmet
+      ctx.fillStyle = "#1f2937";
+      ctx.beginPath();
+      ctx.arc(x, y - 100, 22, Math.PI, Math.PI * 2);
+      ctx.fill();
+
+      // Arms
+      ctx.strokeStyle = "#ef4444";
+      ctx.lineWidth = 9;
+      ctx.beginPath();
+      ctx.moveTo(x, y - 55);
+      ctx.lineTo(x + 45, y - 78);
+      ctx.stroke();
+
+      // Bat
+      ctx.strokeStyle = swingFlash > 0 ? "#facc15" : "#8b5a2b";
+      ctx.lineWidth = 8;
+      ctx.beginPath();
+      if (swingFlash > 0) {
+        ctx.moveTo(x + 35, y - 78);
+        ctx.lineTo(x + 130, y - 42);
+      } else {
+        ctx.moveTo(x + 35, y - 78);
+        ctx.lineTo(x + 95, y - 125);
+      }
+      ctx.stroke();
+    }
+
+    function drawBall() {
+      if (!ball || ball.hit) return;
+
+      const pos = getBallScreenPosition();
+
+      // Extra safety: do not draw if any value is invalid.
+      if (!Number.isFinite(pos.x) || !Number.isFinite(pos.y) || !Number.isFinite(pos.radius)) return;
+
+      const safeRadius = clamp(Math.abs(pos.radius), 2, 50);
+
+      // Shadow
+      ctx.fillStyle = "rgba(0,0,0,0.25)";
+      ctx.beginPath();
+      ctx.ellipse(pos.x + 5, pos.y + safeRadius + 10, safeRadius * 0.95, safeRadius * 0.28, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Baseball
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, safeRadius, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = "#e11d48";
+      ctx.lineWidth = Math.max(1, safeRadius * 0.11);
+
+      // Stitches
+      ctx.beginPath();
+      ctx.arc(pos.x - safeRadius * 0.25, pos.y, safeRadius * 0.58, -1.25, 1.25);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(pos.x + safeRadius * 0.25, pos.y, safeRadius * 0.58, Math.PI - 1.25, Math.PI + 1.25);
+      ctx.stroke();
+
+      // Ball outline
+      ctx.strokeStyle = "rgba(15,23,42,0.35)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, safeRadius, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, cw, ch);
+      drawField();
+      drawBatter();
+      drawBall();
+    }
+
+    function gameLoop(now) {
+      if (!gameRunning) return;
+
+      const dt = Math.min(40, now - lastTime);
+      lastTime = now;
+
+      update(dt);
+      draw();
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Draw the starting field behind the menu.
+    drawField();
+    drawBatter();
+  </script>
 </body>
 </html>
-
