@@ -1,0 +1,501 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.5">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.7px Arial; -webkit-text-stroke: #000000}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000; min-height: 14.0px}
+    span.s1 {font-kerning: none}
+  </style>
+</head>
+<body>
+<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
+<p class="p1"><span class="s1">&lt;html lang="en"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;head&gt;</span></p>
+<p class="p1"><span class="s1">    &lt;meta charset="UTF-8"&gt;</span></p>
+<p class="p1"><span class="s1">    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"&gt;</span></p>
+<p class="p1"><span class="s1">    &lt;title&gt;Infinite Batting Practice 3D&lt;/title&gt;</span></p>
+<p class="p1"><span class="s1">    &lt;style&gt;</span></p>
+<p class="p1"><span class="s1">        * {</span></p>
+<p class="p1"><span class="s1">            box-sizing: border-box;</span></p>
+<p class="p1"><span class="s1">            user-select: none;</span></p>
+<p class="p1"><span class="s1">            -webkit-user-select: none;</span></p>
+<p class="p1"><span class="s1">            margin: 0;</span></p>
+<p class="p1"><span class="s1">            padding: 0;</span></p>
+<p class="p1"><span class="s1">        }</span></p>
+<p class="p1"><span class="s1">        body {</span></p>
+<p class="p1"><span class="s1">            background-color: #0d131a;</span></p>
+<p class="p1"><span class="s1">            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;</span></p>
+<p class="p1"><span class="s1">            display: flex;</span></p>
+<p class="p1"><span class="s1">            justify-content: center;</span></p>
+<p class="p1"><span class="s1">            align-items: center;</span></p>
+<p class="p1"><span class="s1">            height: 100vh;</span></p>
+<p class="p1"><span class="s1">            overflow: hidden;</span></p>
+<p class="p1"><span class="s1">        }</span></p>
+<p class="p1"><span class="s1">        #game-container {</span></p>
+<p class="p1"><span class="s1">            position: relative;</span></p>
+<p class="p1"><span class="s1">            width: 100vw;</span></p>
+<p class="p1"><span class="s1">            height: 100vh;</span></p>
+<p class="p1"><span class="s1">            max-width: 1024px;</span></p>
+<p class="p1"><span class="s1">            max-height: 768px;</span></p>
+<p class="p1"><span class="s1">            background: linear-gradient(to bottom, #111d4a, #2a5298);</span></p>
+<p class="p1"><span class="s1">            overflow: hidden;</span></p>
+<p class="p1"><span class="s1">        }</span></p>
+<p class="p1"><span class="s1">        canvas {</span></p>
+<p class="p1"><span class="s1">            width: 100%;</span></p>
+<p class="p1"><span class="s1">            height: 100%;</span></p>
+<p class="p1"><span class="s1">            display: block;</span></p>
+<p class="p1"><span class="s1">        }</span></p>
+<p class="p1"><span class="s1">        #ui-layer {</span></p>
+<p class="p1"><span class="s1">            position: absolute;</span></p>
+<p class="p1"><span class="s1">            top: 0;</span></p>
+<p class="p1"><span class="s1">            left: 0;</span></p>
+<p class="p1"><span class="s1">            width: 100%;</span></p>
+<p class="p1"><span class="s1">            height: 100%;</span></p>
+<p class="p1"><span class="s1">            pointer-events: none;</span></p>
+<p class="p1"><span class="s1">        }</span></p>
+<p class="p1"><span class="s1">        .hud {</span></p>
+<p class="p1"><span class="s1">            position: absolute;</span></p>
+<p class="p1"><span class="s1">            top: 20px;</span></p>
+<p class="p1"><span class="s1">            background: rgba(11, 19, 30, 0.85);</span></p>
+<p class="p1"><span class="s1">            padding: 12px 25px;</span></p>
+<p class="p1"><span class="s1">            border-radius: 30px;</span></p>
+<p class="p1"><span class="s1">            color: white;</span></p>
+<p class="p1"><span class="s1">            font-weight: 800;</span></p>
+<p class="p1"><span class="s1">            font-size: 1.1rem;</span></p>
+<p class="p1"><span class="s1">            border: 2px solid rgba(255, 255, 255, 0.1);</span></p>
+<p class="p1"><span class="s1">            backdrop-filter: blur(8px);</span></p>
+<p class="p1"><span class="s1">            pointer-events: auto;</span></p>
+<p class="p1"><span class="s1">            box-shadow: 0 8px 32px rgba(0,0,0,0.3);</span></p>
+<p class="p1"><span class="s1">        }</span></p>
+<p class="p1"><span class="s1">        #stats-panel {</span></p>
+<p class="p1"><span class="s1">            left: 20px;</span></p>
+<p class="p1"><span class="s1">            display: flex;</span></p>
+<p class="p1"><span class="s1">            gap: 20px;</span></p>
+<p class="p1"><span class="s1">        }</span></p>
+<p class="p1"><span class="s1">        .stat-group {</span></p>
+<p class="p1"><span class="s1">            display: flex;</span></p>
+<p class="p1"><span class="s1">            align-items: center;</span></p>
+<p class="p1"><span class="s1">            gap: 6px;</span></p>
+<p class="p1"><span class="s1">        }</span></p>
+<p class="p1"><span class="s1">        .label { color: #8a9fc4; font-size: 0.85rem; text-transform: uppercase; }</span></p>
+<p class="p1"><span class="s1">        .val { color: #fff; }</span></p>
+<p class="p1"><span class="s1">        #streak-val { color: #ff9f43; font-weight: 900; }</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">        #pitch-feedback {</span></p>
+<p class="p1"><span class="s1">            right: 20px;</span></p>
+<p class="p1"><span class="s1">            color: #fff;</span></p>
+<p class="p1"><span class="s1">            text-transform: uppercase;</span></p>
+<p class="p1"><span class="s1">            letter-spacing: 1px;</span></p>
+<p class="p1"><span class="s1">            min-width: 180px;</span></p>
+<p class="p1"><span class="s1">            text-align: center;</span></p>
+<p class="p1"><span class="s1">            transition: all 0.2s ease;</span></p>
+<p class="p1"><span class="s1">        }</span></p>
+<p class="p1"><span class="s1">        .fb-good { color: #2ed573 !important; text-shadow: 0 0 10px rgba(46,213,115,0.4); }</span></p>
+<p class="p1"><span class="s1">        .fb-great { color: #ff9f43 !important; text-shadow: 0 0 15px rgba(255,159,67,0.6); }</span></p>
+<p class="p1"><span class="s1">        .fb-miss { color: #ff4757 !important; }</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">        /* Bottom right corner control placement */</span></p>
+<p class="p1"><span class="s1">        #touch-zone {</span></p>
+<p class="p1"><span class="s1">            position: absolute;</span></p>
+<p class="p1"><span class="s1">            bottom: 40px;</span></p>
+<p class="p1"><span class="s1">            right: 40px;</span></p>
+<p class="p1"><span class="s1">            pointer-events: auto;</span></p>
+<p class="p1"><span class="s1">            z-index: 10;</span></p>
+<p class="p1"><span class="s1">        }</span></p>
+<p class="p1"><span class="s1">        #swing-btn {</span></p>
+<p class="p1"><span class="s1">            width: 130px;</span></p>
+<p class="p1"><span class="s1">            height: 130px;</span></p>
+<p class="p1"><span class="s1">            background: linear-gradient(135deg, #ff4757, #ff6b81);</span></p>
+<p class="p1"><span class="s1">            border-radius: 50%;</span></p>
+<p class="p1"><span class="s1">            border: 5px solid #ffffff;</span></p>
+<p class="p1"><span class="s1">            color: white;</span></p>
+<p class="p1"><span class="s1">            font-size: 1.6rem;</span></p>
+<p class="p1"><span class="s1">            font-weight: 900;</span></p>
+<p class="p1"><span class="s1">            box-shadow: 0 12px 24px rgba(255, 71, 87, 0.4);</span></p>
+<p class="p1"><span class="s1">            display: flex;</span></p>
+<p class="p1"><span class="s1">            justify-content: center;</span></p>
+<p class="p1"><span class="s1">            align-items: center;</span></p>
+<p class="p1"><span class="s1">            transition: transform 0.05s;</span></p>
+<p class="p1"><span class="s1">        }</span></p>
+<p class="p1"><span class="s1">        #swing-btn:active {</span></p>
+<p class="p1"><span class="s1">            transform: scale(0.90) translateY(4px);</span></p>
+<p class="p1"><span class="s1">        }</span></p>
+<p class="p1"><span class="s1">    &lt;/style&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
+<p class="p1"><span class="s1">&lt;body&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;div id="game-container"&gt;</span></p>
+<p class="p1"><span class="s1">    &lt;canvas id="gameCanvas"&gt;&lt;/canvas&gt;</span></p>
+<p class="p1"><span class="s1">    </span></p>
+<p class="p1"><span class="s1">    &lt;div id="ui-layer"&gt;</span></p>
+<p class="p1"><span class="s1">        &lt;div id="stats-panel" class="hud"&gt;</span></p>
+<p class="p1"><span class="s1">            &lt;div class="stat-group"&gt;&lt;span class="label"&gt;HITS:&lt;/span&gt;&lt;span id="hits-val" class="val"&gt;0&lt;/span&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">            &lt;div class="stat-group"&gt;&lt;span class="label"&gt;STREAK:&lt;/span&gt;&lt;span id="streak-val" class="val"&gt;0&lt;/span&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">        &lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">        </span></p>
+<p class="p1"><span class="s1">        &lt;div id="pitch-feedback" class="hud"&gt;LOADING...&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">        </span></p>
+<p class="p1"><span class="s1">        &lt;div id="touch-zone"&gt;</span></p>
+<p class="p1"><span class="s1">            &lt;div id="swing-btn"&gt;SWING&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">        &lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">    &lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;script&gt;</span></p>
+<p class="p1"><span class="s1">    const canvas = document.getElementById('gameCanvas');</span></p>
+<p class="p1"><span class="s1">    const ctx = canvas.getContext('2d');</span></p>
+<p class="p1"><span class="s1">    const hitsVal = document.getElementById('hits-val');</span></p>
+<p class="p1"><span class="s1">    const streakVal = document.getElementById('streak-val');</span></p>
+<p class="p1"><span class="s1">    const pitchFeedback = document.getElementById('pitch-feedback');</span></p>
+<p class="p1"><span class="s1">    const swingBtn = document.getElementById('swing-btn');</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">    function resizeCanvas() {</span></p>
+<p class="p1"><span class="s1">        const container = document.getElementById('game-container');</span></p>
+<p class="p1"><span class="s1">        canvas.width = container.clientWidth * window.devicePixelRatio;</span></p>
+<p class="p1"><span class="s1">        canvas.height = container.clientHeight * window.devicePixelRatio;</span></p>
+<p class="p1"><span class="s1">        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);</span></p>
+<p class="p1"><span class="s1">    }</span></p>
+<p class="p1"><span class="s1">    window.addEventListener('resize', resizeCanvas);</span></p>
+<p class="p1"><span class="s1">    resizeCanvas();</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">    const width = 1024;</span></p>
+<p class="p1"><span class="s1">    const height = 768;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">    // Practice Mode State Machine</span></p>
+<p class="p1"><span class="s1">    let totalHits = 0;</span></p>
+<p class="p1"><span class="s1">    let currentStreak = 0;</span></p>
+<p class="p1"><span class="s1">    let gameState = 'ready'; // ready, pitching, contact, tracking</span></p>
+<p class="p1"><span class="s1">    let autoPitchTimer = null;</span></p>
+<p class="p1"><span class="s1">    </span></p>
+<p class="p1"><span class="s1">    // Smooth Camera Setup</span></p>
+<p class="p1"><span class="s1">    const cam = { horizon: 310, fov: 380, center: 512 };</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">    function project3D(x, y, z) {</span></p>
+<p class="p1"><span class="s1">        const scale = cam.fov / (cam.fov + z);</span></p>
+<p class="p1"><span class="s1">        return {</span></p>
+<p class="p1"><span class="s1">            x: cam.center + (x * scale),</span></p>
+<p class="p1"><span class="s1">            y: cam.horizon + (y * scale),</span></p>
+<p class="p1"><span class="s1">            scale: scale</span></p>
+<p class="p1"><span class="s1">        };</span></p>
+<p class="p1"><span class="s1">    }</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">    // Ball Simulation Engine</span></p>
+<p class="p1"><span class="s1">    let ball = { x: 0, y: -45, z: 650, vx: 0, vy: 0, vz: 0, radius: 9, active: false };</span></p>
+<p class="p1"><span class="s1">    </span></p>
+<p class="p1"><span class="s1">    // Fluid Batter Geometry Configuration</span></p>
+<p class="p1"><span class="s1">    let batter = {</span></p>
+<p class="p1"><span class="s1">        x: -75, y: 170, z: 40,</span></p>
+<p class="p1"><span class="s1">        batLength: 115,</span></p>
+<p class="p1"><span class="s1">        swingFrame: 0,</span></p>
+<p class="p1"><span class="s1">        isSwinging: false,</span></p>
+<p class="p1"><span class="s1">        angle: -Math.PI / 4</span></p>
+<p class="p1"><span class="s1">    };</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">    // visual hitting cage lines tracking </span></p>
+<p class="p1"><span class="s1">    let cagePoints = [];</span></p>
+<p class="p1"><span class="s1">    for(let i=0; i&lt;=650; i+=50) {</span></p>
+<p class="p1"><span class="s1">        cagePoints.push(i);</span></p>
+<p class="p1"><span class="s1">    }</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">    let particles = [];</span></p>
+<p class="p1"><span class="s1">    function spawnParticles(x, y, color, count=25) {</span></p>
+<p class="p1"><span class="s1">        for(let i=0; i&lt;count; i++) {</span></p>
+<p class="p1"><span class="s1">            particles.push({</span></p>
+<p class="p1"><span class="s1">                x: x, y: y,</span></p>
+<p class="p1"><span class="s1">                vx: (Math.random() - 0.5) * 18,</span></p>
+<p class="p1"><span class="s1">                vy: (Math.random() - 0.5) * 18,</span></p>
+<p class="p1"><span class="s1">                r: Math.random() * 4 + 2,</span></p>
+<p class="p1"><span class="s1">                alpha: 1,</span></p>
+<p class="p1"><span class="s1">                color: color</span></p>
+<p class="p1"><span class="s1">            });</span></p>
+<p class="p1"><span class="s1">        }</span></p>
+<p class="p1"><span class="s1">    }</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">    // Multi-touch &amp; Input configuration</span></p>
+<p class="p1"><span class="s1">    swingBtn.addEventListener('touchstart', (e) =&gt; {</span></p>
+<p class="p1"><span class="s1">        e.preventDefault();</span></p>
+<p class="p1"><span class="s1">        executeSwing();</span></p>
+<p class="p1"><span class="s1">    });</span></p>
+<p class="p1"><span class="s1">    window.addEventListener('keydown', (e) =&gt; {</span></p>
+<p class="p1"><span class="s1">        if(e.code === 'Space') executeSwing();</span></p>
+<p class="p1"><span class="s1">    });</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">    function executeSwing() {</span></p>
+<p class="p1"><span class="s1">        if (batter.isSwinging) return;</span></p>
+<p class="p1"><span class="s1">        </span></p>
+<p class="p1"><span class="s1">        batter.isSwinging = true;</span></p>
+<p class="p1"><span class="s1">        batter.swingFrame = 1;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">        // Dynamic hit engine check</span></p>
+<p class="p1"><span class="s1">        if (ball.active &amp;&amp; gameState === 'pitching') {</span></p>
+<p class="p1"><span class="s1">            // Check hitting window plane depth</span></p>
+<p class="p1"><span class="s1">            if (ball.z &gt;= 15 &amp;&amp; ball.z &lt;= 95) {</span></p>
+<p class="p1"><span class="s1">                ball.active = false;</span></p>
+<p class="p1"><span class="s1">                gameState = 'contact';</span></p>
+<p class="p1"><span class="s1">                </span></p>
+<p class="p1"><span class="s1">                const distanceToSweetSpot = Math.abs(ball.z - 50);</span></p>
+<p class="p1"><span class="s1">                </span></p>
+<p class="p1"><span class="s1">                if (distanceToSweetSpot &lt; 18) { // Perfect Timing Burst</span></p>
+<p class="p1"><span class="s1">                    totalHits++;</span></p>
+<p class="p1"><span class="s1">                    currentStreak++;</span></p>
+<p class="p1"><span class="s1">                    setFeedback("🔥 CRUSHED!", "fb-great");</span></p>
+<p class="p1"><span class="s1">                    spawnParticles(project3D(ball.x, ball.y, ball.z).x, project3D(ball.x, ball.y, ball.z).y, '#ff9f43', 35);</span></p>
+<p class="p1"><span class="s1">                    </span></p>
+<p class="p1"><span class="s1">                    ball.vx = (Math.random() - 0.5) * 25;</span></p>
+<p class="p1"><span class="s1">                    ball.vy = -28;</span></p>
+<p class="p1"><span class="s1">                    ball.vz = 500; </span></p>
+<p class="p1"><span class="s1">                } else { // Safe Solid Base Hit</span></p>
+<p class="p1"><span class="s1">                    totalHits++;</span></p>
+<p class="p1"><span class="s1">                    currentStreak++;</span></p>
+<p class="p1"><span class="s1">                    setFeedback("⚾ GOOD HIT!", "fb-good");</span></p>
+<p class="p1"><span class="s1">                    spawnParticles(project3D(ball.x, ball.y, ball.z).x, project3D(ball.x, ball.y, ball.z).y, '#2ed573', 20);</span></p>
+<p class="p1"><span class="s1">                    </span></p>
+<p class="p1"><span class="s1">                    ball.vx = (Math.random() - 0.5) * 18;</span></p>
+<p class="p1"><span class="s1">                    ball.vy = -14;</span></p>
+<p class="p1"><span class="s1">                    ball.vz = 300;</span></p>
+<p class="p1"><span class="s1">                }</span></p>
+<p class="p1"><span class="s1">                </span></p>
+<p class="p1"><span class="s1">                updateCounters();</span></p>
+<p class="p1"><span class="s1">                queueNextPitch(2200);</span></p>
+<p class="p1"><span class="s1">            }</span></p>
+<p class="p1"><span class="s1">        }</span></p>
+<p class="p1"><span class="s1">    }</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">    function setFeedback(text, className="") {</span></p>
+<p class="p1"><span class="s1">        pitchFeedback.innerText = text;</span></p>
+<p class="p1"><span class="s1">        pitchFeedback.className = "hud " + className;</span></p>
+<p class="p1"><span class="s1">    }</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">    function updateCounters() {</span></p>
+<p class="p1"><span class="s1">        hitsVal.innerText = totalHits;</span></p>
+<p class="p1"><span class="s1">        streakVal.innerText = currentStreak;</span></p>
+<p class="p1"><span class="s1">    }</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">    // Unstoppable Batting Practice Pipeline Auto-Throw</span></p>
+<p class="p1"><span class="s1">    function autoThrowPitch() {</span></p>
+<p class="p1"><span class="s1">        // Enforce reset on old states safely</span></p>
+<p class="p1"><span class="s1">        if(autoPitchTimer) clearTimeout(autoPitchTimer);</span></p>
+<p class="p1"><span class="s1">        </span></p>
+<p class="p1"><span class="s1">        gameState = 'pitching';</span></p>
+<p class="p1"><span class="s1">        setFeedback("PITCH COMING...", "");</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">        // Reset ball path coordinates to launch machine position</span></p>
+<p class="p1"><span class="s1">        ball.x = (Math.random() - 0.5) * 8; </span></p>
+<p class="p1"><span class="s1">        ball.y = -40; </span></p>
+<p class="p1"><span class="s1">        ball.z = 650; </span></p>
+<p class="p1"><span class="s1">        </span></p>
+<p class="p1"><span class="s1">        // Balanced easy glide speeds </span></p>
+<p class="p1"><span class="s1">        ball.vz = -8.2; </span></p>
+<p class="p1"><span class="s1">        ball.vy = 2.0;  </span></p>
+<p class="p1"><span class="s1">        ball.vx = (Math.random() - 0.5) * 0.4;</span></p>
+<p class="p1"><span class="s1">        ball.active = true;</span></p>
+<p class="p1"><span class="s1">    }</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">    function queueNextPitch(delay) {</span></p>
+<p class="p1"><span class="s1">        if(autoPitchTimer) clearTimeout(autoPitchTimer);</span></p>
+<p class="p1"><span class="s1">        gameState = 'tracking';</span></p>
+<p class="p1"><span class="s1">        autoPitchTimer = setTimeout(() =&gt; {</span></p>
+<p class="p1"><span class="s1">            autoThrowPitch();</span></p>
+<p class="p1"><span class="s1">        }, delay);</span></p>
+<p class="p1"><span class="s1">    }</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">    // Frame Interpolation Pipeline Loop</span></p>
+<p class="p1"><span class="s1">    function update() {</span></p>
+<p class="p1"><span class="s1">        // Multi-frame rotational swing script</span></p>
+<p class="p1"><span class="s1">        if (batter.isSwinging) {</span></p>
+<p class="p1"><span class="s1">            batter.swingFrame++;</span></p>
+<p class="p1"><span class="s1">            let progress = batter.swingFrame / 15; // Normalized frame duration</span></p>
+<p class="p1"><span class="s1">            </span></p>
+<p class="p1"><span class="s1">            // Complete smooth trigonometric rotational arc</span></p>
+<p class="p1"><span class="s1">            batter.angle = -Math.PI/4 + (Math.PI * 1.35 * Math.sin(progress * Math.PI / 2));</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">            if (batter.swingFrame &gt;= 15) {</span></p>
+<p class="p1"><span class="s1">                batter.isSwinging = false;</span></p>
+<p class="p1"><span class="s1">                batter.swingFrame = 0;</span></p>
+<p class="p1"><span class="s1">                batter.angle = -Math.PI / 4; </span></p>
+<p class="p1"><span class="s1">            }</span></p>
+<p class="p1"><span class="s1">        }</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">        // Processing active pitches towards plate</span></p>
+<p class="p1"><span class="s1">        if (ball.active &amp;&amp; gameState === 'pitching') {</span></p>
+<p class="p1"><span class="s1">            ball.z += ball.vz;</span></p>
+<p class="p1"><span class="s1">            ball.y += ball.vy;</span></p>
+<p class="p1"><span class="s1">            ball.x += ball.vx;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">            // Missed execution fallback route</span></p>
+<p class="p1"><span class="s1">            if (ball.z &lt; -20) {</span></p>
+<p class="p1"><span class="s1">                ball.active = false;</span></p>
+<p class="p1"><span class="s1">                currentStreak = 0;</span></p>
+<p class="p1"><span class="s1">                updateCounters();</span></p>
+<p class="p1"><span class="s1">                setFeedback("❌ MISS / STRIKE", "fb-miss");</span></p>
+<p class="p1"><span class="s1">                queueNextPitch(1500); // Instantly queues next automated pitch</span></p>
+<p class="p1"><span class="s1">            }</span></p>
+<p class="p1"><span class="s1">        }</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">        // Forward fly ball physics update engine</span></p>
+<p class="p1"><span class="s1">        if (!ball.active &amp;&amp; (gameState === 'contact' || gameState === 'tracking')) {</span></p>
+<p class="p1"><span class="s1">            ball.z += ball.vz;</span></p>
+<p class="p1"><span class="s1">            ball.y += ball.vy;</span></p>
+<p class="p1"><span class="s1">            ball.x += ball.vx;</span></p>
+<p class="p1"><span class="s1">            if(ball.y &lt; 350) ball.vy += 0.5; // Simulate smooth gravity drop arc</span></p>
+<p class="p1"><span class="s1">        }</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">        // Particle thread execution loops</span></p>
+<p class="p1"><span class="s1">        for (let i = particles.length - 1; i &gt;= 0; i--) {</span></p>
+<p class="p1"><span class="s1">            let p = particles[i];</span></p>
+<p class="p1"><span class="s1">            p.x += p.vx;</span></p>
+<p class="p1"><span class="s1">            p.y += p.vy;</span></p>
+<p class="p1"><span class="s1">            p.alpha -= 0.025;</span></p>
+<p class="p1"><span class="s1">            if (p.alpha &lt;= 0) particles.splice(i, 1);</span></p>
+<p class="p1"><span class="s1">        }</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">        // Safe loop structural initialization fallback</span></p>
+<p class="p1"><span class="s1">        if (gameState === 'ready') {</span></p>
+<p class="p1"><span class="s1">            queueNextPitch(1000);</span></p>
+<p class="p1"><span class="s1">        }</span></p>
+<p class="p1"><span class="s1">    }</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">    // Dynamic 3D Scene Rendering</span></p>
+<p class="p1"><span class="s1">    function draw() {</span></p>
+<p class="p1"><span class="s1">        ctx.clearRect(0, 0, width, height);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">        // 1. Render Outfield Green Astro Turf</span></p>
+<p class="p1"><span class="s1">        ctx.fillStyle = '#10ac84';</span></p>
+<p class="p1"><span class="s1">        ctx.fillRect(0, cam.horizon, width, height - cam.horizon);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">        // 2. Render 3D Batting Tunnel Mesh Guides</span></p>
+<p class="p1"><span class="s1">        ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';</span></p>
+<p class="p1"><span class="s1">        ctx.lineWidth = 2;</span></p>
+<p class="p1"><span class="s1">        cagePoints.forEach(z =&gt; {</span></p>
+<p class="p1"><span class="s1">            let leftWall = project3D(-180, -120, z);</span></p>
+<p class="p1"><span class="s1">            let rightWall = project3D(180, -120, z);</span></p>
+<p class="p1"><span class="s1">            let leftFloor = project3D(-180, 180, z);</span></p>
+<p class="p1"><span class="s1">            let rightFloor = project3D(180, 180, z);</span></p>
+<p class="p1"><span class="s1">            </span></p>
+<p class="p1"><span class="s1">            ctx.beginPath();</span></p>
+<p class="p1"><span class="s1">            ctx.moveTo(leftWall.x, leftWall.y);</span></p>
+<p class="p1"><span class="s1">            ctx.lineTo(rightWall.x, rightWall.y);</span></p>
+<p class="p1"><span class="s1">            ctx.lineTo(rightFloor.x, rightFloor.y);</span></p>
+<p class="p1"><span class="s1">            ctx.lineTo(leftFloor.x, leftFloor.y);</span></p>
+<p class="p1"><span class="s1">            ctx.closePath();</span></p>
+<p class="p1"><span class="s1">            ctx.stroke();</span></p>
+<p class="p1"><span class="s1">        });</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">        // 3. Render Solid Clay Infield Batter Box Circle</span></p>
+<p class="p1"><span class="s1">        let pPlate = project3D(0, 180, 50);</span></p>
+<p class="p1"><span class="s1">        ctx.fillStyle = '#dd8d54';</span></p>
+<p class="p1"><span class="s1">        ctx.beginPath();</span></p>
+<p class="p1"><span class="s1">        ctx.ellipse(pPlate.x, pPlate.y, 140 * pPlate.scale, 50 * pPlate.scale, 0, 0, Math.PI*2);</span></p>
+<p class="p1"><span class="s1">        ctx.fill();</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">        // White home plate line draw</span></p>
+<p class="p1"><span class="s1">        ctx.fillStyle = '#ffffff';</span></p>
+<p class="p1"><span class="s1">        ctx.beginPath();</span></p>
+<p class="p1"><span class="s1">        ctx.moveTo(pPlate.x - 22 * pPlate.scale, pPlate.y);</span></p>
+<p class="p1"><span class="s1">        ctx.lineTo(pPlate.x + 22 * pPlate.scale, pPlate.y);</span></p>
+<p class="p1"><span class="s1">        ctx.lineTo(pPlate.x + 26 * pPlate.scale, pPlate.y + 16 * pPlate.scale);</span></p>
+<p class="p1"><span class="s1">        ctx.lineTo(pPlate.x, pPlate.y + 32 * pPlate.scale);</span></p>
+<p class="p1"><span class="s1">        ctx.lineTo(pPlate.x - 26 * pPlate.scale, pPlate.y + 16 * pPlate.scale);</span></p>
+<p class="p1"><span class="s1">        ctx.closePath();</span></p>
+<p class="p1"><span class="s1">        ctx.fill();</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">        // 4. Clean Mechanical Pitching Machine Object (Replaces weird players)</span></p>
+<p class="p1"><span class="s1">        let pMachine = project3D(0, 180, 650);</span></p>
+<p class="p1"><span class="s1">        ctx.fillStyle = '#2c3e50'; // Machine Base housing</span></p>
+<p class="p1"><span class="s1">        ctx.fillRect(pMachine.x - 16 * pMachine.scale, pMachine.y - 45 * pMachine.scale, 32 * pMachine.scale, 45 * pMachine.scale);</span></p>
+<p class="p1"><span class="s1">        ctx.fillStyle = '#7f8c8d'; // Launch feeder pipe</span></p>
+<p class="p1"><span class="s1">        ctx.beginPath();</span></p>
+<p class="p1"><span class="s1">        ctx.arc(pMachine.x, pMachine.y - 45 * pMachine.scale, 10 * pMachine.scale, 0, Math.PI*2);</span></p>
+<p class="p1"><span class="s1">        ctx.fill();</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">        // 5. Render Batter Shadow Geometry</span></p>
+<p class="p1"><span class="s1">        let pBatter = project3D(batter.x, batter.y, batter.z);</span></p>
+<p class="p1"><span class="s1">        ctx.fillStyle = 'rgba(0,0,0,0.35)';</span></p>
+<p class="p1"><span class="s1">        ctx.beginPath();</span></p>
+<p class="p1"><span class="s1">        ctx.ellipse(pBatter.x, pBatter.y + 10, 42 * pBatter.scale, 14 * pBatter.scale, 0, 0, Math.PI*2);</span></p>
+<p class="p1"><span class="s1">        ctx.fill();</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">        // 6. Draw Detailed Batter Character Mesh Model</span></p>
+<p class="p1"><span class="s1">        ctx.fillStyle = '#0984e3'; // Clean Pro Jersey</span></p>
+<p class="p1"><span class="s1">        ctx.fillRect(pBatter.x - 18 * pBatter.scale, pBatter.y - 92 * pBatter.scale, 36 * pBatter.scale, 92 * pBatter.scale); </span></p>
+<p class="p1"><span class="s1">        ctx.fillStyle = '#ffeedd'; // Skin tone elements</span></p>
+<p class="p1"><span class="s1">        ctx.beginPath();</span></p>
+<p class="p1"><span class="s1">        ctx.arc(pBatter.x, pBatter.y - 108 * pBatter.scale, 16 * pBatter.scale, 0, Math.PI*2); </span></p>
+<p class="p1"><span class="s1">        ctx.fill();</span></p>
+<p class="p1"><span class="s1">        ctx.fillStyle = '#222f3e'; // Protection Helmet</span></p>
+<p class="p1"><span class="s1">        ctx.beginPath();</span></p>
+<p class="p1"><span class="s1">        ctx.arc(pBatter.x, pBatter.y - 112 * pBatter.scale, 17 * pBatter.scale, Math.PI, 0); </span></p>
+<p class="p1"><span class="s1">        ctx.fill();</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">        // 7. Render 3D Bat with Vector Matrix Rotational sweeps</span></p>
+<p class="p1"><span class="s1">        ctx.save();</span></p>
+<p class="p1"><span class="s1">        ctx.translate(pBatter.x + 12 * pBatter.scale, pBatter.y - 68 * pBatter.scale);</span></p>
+<p class="p1"><span class="s1">        ctx.rotate(batter.angle);</span></p>
+<p class="p1"><span class="s1">        </span></p>
+<p class="p1"><span class="s1">        let batGrad = ctx.createLinearGradient(0, 0, batter.batLength * pBatter.scale, 0);</span></p>
+<p class="p1"><span class="s1">        batGrad.addColorStop(0, '#2d3436'); // Grip tape wrap </span></p>
+<p class="p1"><span class="s1">        batGrad.addColorStop(0.2, '#f39c12'); // Natural wood grain barrel</span></p>
+<p class="p1"><span class="s1">        batGrad.addColorStop(1, '#f1c40f');</span></p>
+<p class="p1"><span class="s1">        ctx.fillStyle = batGrad;</span></p>
+<p class="p1"><span class="s1">        </span></p>
+<p class="p1"><span class="s1">        ctx.beginPath();</span></p>
+<p class="p1"><span class="s1">        ctx.moveTo(0, -3 * pBatter.scale);</span></p>
+<p class="p1"><span class="s1">        ctx.lineTo(batter.batLength * pBatter.scale, -8 * pBatter.scale);</span></p>
+<p class="p1"><span class="s1">        ctx.lineTo(batter.batLength * pBatter.scale, 8 * pBatter.scale);</span></p>
+<p class="p1"><span class="s1">        ctx.lineTo(0, 3 * pBatter.scale);</span></p>
+<p class="p1"><span class="s1">        ctx.closePath();</span></p>
+<p class="p1"><span class="s1">        ctx.fill();</span></p>
+<p class="p1"><span class="s1">        ctx.restore();</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">        // 8. Render 3D Ball Asset Profile</span></p>
+<p class="p1"><span class="s1">        if (ball.active || gameState === 'contact' || gameState === 'tracking') {</span></p>
+<p class="p1"><span class="s1">            let pBall = project3D(ball.x, ball.y, ball.z);</span></p>
+<p class="p1"><span class="s1">            let pBallShadow = project3D(ball.x, 180, ball.z);</span></p>
+<p class="p1"><span class="s1">            </span></p>
+<p class="p1"><span class="s1">            // Ground track trace shadow circle</span></p>
+<p class="p1"><span class="s1">            ctx.fillStyle = 'rgba(0,0,0,0.3)';</span></p>
+<p class="p1"><span class="s1">            ctx.beginPath();</span></p>
+<p class="p1"><span class="s1">            ctx.arc(pBallShadow.x, pBallShadow.y, (ball.radius * pBallShadow.scale) * 1.1, 0, Math.PI*2);</span></p>
+<p class="p1"><span class="s1">            ctx.fill();</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">            // Luminous Baseball Core Render</span></p>
+<p class="p1"><span class="s1">            ctx.fillStyle = '#ffffff';</span></p>
+<p class="p1"><span class="s1">            ctx.shadowBlur = 12;</span></p>
+<p class="p1"><span class="s1">            ctx.shadowColor = '#ffffff';</span></p>
+<p class="p1"><span class="s1">            ctx.beginPath();</span></p>
+<p class="p1"><span class="s1">            ctx.arc(pBall.x, pBall.y, ball.radius * pBall.scale, 0, Math.PI*2);</span></p>
+<p class="p1"><span class="s1">            ctx.fill();</span></p>
+<p class="p1"><span class="s1">            ctx.shadowBlur = 0; </span></p>
+<p class="p1"><span class="s1">        }</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">        // 9. Particles rendering loop array</span></p>
+<p class="p1"><span class="s1">        particles.forEach(p =&gt; {</span></p>
+<p class="p1"><span class="s1">            ctx.save();</span></p>
+<p class="p1"><span class="s1">            ctx.globalAlpha = p.alpha;</span></p>
+<p class="p1"><span class="s1">            ctx.fillStyle = p.color;</span></p>
+<p class="p1"><span class="s1">            ctx.beginPath();</span></p>
+<p class="p1"><span class="s1">            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);</span></p>
+<p class="p1"><span class="s1">            ctx.fill();</span></p>
+<p class="p1"><span class="s1">            ctx.restore();</span></p>
+<p class="p1"><span class="s1">        });</span></p>
+<p class="p1"><span class="s1">    }</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">    function gameLoop() {</span></p>
+<p class="p1"><span class="s1">        update();</span></p>
+<p class="p1"><span class="s1">        draw();</span></p>
+<p class="p1"><span class="s1">        requestAnimationFrame(gameLoop);</span></p>
+<p class="p1"><span class="s1">    }</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">    gameLoop();</span></p>
+<p class="p1"><span class="s1">&lt;/script&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+</body>
+</html>
